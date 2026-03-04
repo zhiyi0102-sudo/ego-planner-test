@@ -1,0 +1,33 @@
+<launch>
+  <!-- Ego Planner Node -->
+  <rosparam command="load" file="$(find ego_planner)/../param/ego_planner.yaml" />
+  <node name="ego_planner_node" pkg="ego_planner" type="ego_planner_node" output="screen" launch-prefix="bash -c 'export LIBGL_ALWAYS_SOFTWARE=1; $0 $@'">
+  </node>
+  
+  <!-- Simulation -->
+  <node name="quadrotor_simulator_so3" pkg="so3_quadrotor_simulator" type="quadrotor_simulator_so3" output="screen" />
+  
+  <!-- Control -->
+  <node name="so3_control" pkg="nodelet" type="nodelet" args="standalone so3_control/SO3ControlNodelet" output="screen">
+    <remap from="~odom" to="/visual_slam/odom" />
+    <remap from="~position_cmd" to="/planning/pos_cmd" />
+  </node>
+  
+  <!-- Visualization (DISABLED - use external RViz) -->
+  <!-- <node name="odom_visualization" pkg="odom_visualization" type="odom_visualization" output="screen" /> -->
+  
+  <!-- Map -->
+  <node name="mockamap_node" pkg="mockamap" type="mockamap_node" output="screen" />
+  
+  <!-- Sensing -->
+  <node name="pcl_render_node" pkg="local_sensing_node" type="pcl_render_node" output="screen" />
+  
+  <!-- Waypoint -->
+  <node name="waypoint_generator" pkg="waypoint_generator" type="waypoint_generator" output="screen" />
+  
+  <!-- Traj Server -->
+  <node name="traj_server" pkg="ego_planner" type="traj_server" output="screen">
+    <remap from="~position_cmd" to="/planning/pos_cmd" />
+    <remap from="~odom_world" to="/visual_slam/odom" />
+  </node>
+</launch>
